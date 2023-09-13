@@ -1,1 +1,1 @@
-Here I have my labs from theory of algorithm course
+Here I have labs from theory of algorithm course
