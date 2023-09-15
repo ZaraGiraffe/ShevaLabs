@@ -1,3 +1,4 @@
 .vs
 *local
 *.exe
+*settings*
