@@ -11,5 +11,6 @@ using namespace std;
 #include"fileparser.cpp"
 #include"errorhandler.cpp"
 #include"chomskyobjects.cpp"
+#include"transformers.cpp"
 
 #endif

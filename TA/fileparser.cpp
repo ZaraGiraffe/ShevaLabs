@@ -10,7 +10,21 @@
 
 using namespace std;
 
-vector<string> parse_line(string line, char delimeter) {
+
+ErrorHandler parse_words(string line, vector<Node> &nodes, char nodes_delimeter) {
+    for (int r = 0, l = 0; r <= line.size(); r++) {
+        if (r == line.size() || line[r] == nodes_delimeter) {
+            if (l == r) 
+                return ErrorHandler("Error near some delimeter", true);
+            nodes.push_back(Node(line.substr(l, r - l)));
+            l = r + 1;
+        }
+    } 
+    return ErrorHandler("-", false);
+}  
+
+
+ErrorHandler parse_line(string line, vector<Rule> &rules, char rules_delimeter, char nodes_delimeter) {
     vector<string> result;
 
     int defis = -1;
@@ -21,7 +35,7 @@ vector<string> parse_line(string line, char delimeter) {
         }
     }
     if (defis == -1)
-        return vector<string>();
+        return ErrorHandler("Problem near the arrow", true);
 
     int arrow = -1;
     for (int i = 0; i < line.size(); i++) {
@@ -31,48 +45,46 @@ vector<string> parse_line(string line, char delimeter) {
         }
     }
     if (arrow == -1 || arrow < defis)
-        return vector<string>();
+        return ErrorHandler("Problem near the arrow", true);
+
+    Node start = line.substr(0, defis);
+    if (start.terminal) 
+        return ErrorHandler("The start of the rule can not be terminal", true);
     
-    result.push_back(line.substr(0, defis));
-    if (!delimeter) {
-        for (int i = arrow + 1; i < line.size(); i++) 
-            result.push_back(line.substr(i, 1));
-    } else {
-        for (int li = arrow+1, ri = arrow+1; ri <= line.size();) {
-            if (bool check = (ri == line.size()) || line[ri] == delimeter) {
-                if (li < line.size()) 
-                    result.push_back(line.substr(li, ri - li));
-                while (ri < line.size() && line[ri] == delimeter)
-                    ri++;
-                li = ri;
-                if (check)
-                    break;
-            }
-            else ri++;
-        }
+    vector<int> rules_pos = {arrow};
+    for (int i = arrow + 1; i < line.size(); i++) {
+        if (line[i] == rules_delimeter)
+            rules_pos.push_back(i);
+    }
+    rules_pos.push_back(line.size());
+
+    for (int i = 1; i < rules_pos.size(); i++) {
+        int left = rules_pos[i - 1] + 1;
+        int right = rules_pos[i];
+        vector<Node> nodes;
+        ErrorHandler ans = parse_words(line.substr(left, right - left), nodes, nodes_delimeter);
+        if (ans.error)
+            return ans;
+        rules.push_back(Rule(start, nodes));
     }
 
-    return result;
+    return ErrorHandler("-", false);
 }
 
-ErrorHandler parse_file(string filename, vector<Rule> &rules, char delimeter = '\0') {
+ErrorHandler parse_file(string filename, vector<Rule> &rules, char rules_delimeter = '|', char nodes_delimeter = ',') {
     ifstream fin(filename);
     if (!fin.is_open()) 
-        return ErrorHandler("the file path is not correct", true);
+        return ErrorHandler("The file path is not correct", true);
+    
     char buffer[100];
     while (!fin.eof()) {
         fin.getline(buffer, sizeof(buffer));
-        vector<string> symbols = parse_line(string(buffer), delimeter);
-        if (symbols.size() <= 1) 
-            return ErrorHandler("error parsing rules", true);
-        if (symbols[0][0] >= 'a')
-            return ErrorHandler("starting symbol in a rule should be non-terminal", true);
-        Node start(symbols[0], false);
-        vector<Node> end;
-        for (int i = 1; i < symbols.size(); i++)
-            end.push_back(Node(symbols[i], symbols[i][0] >= 'a'));
-        rules.push_back(Rule(start, end));
+        ErrorHandler ans = parse_line(string(buffer), rules, rules_delimeter, nodes_delimeter);
+        if (ans.error)
+            return ans;
     }
+
+    fin.close();
     return ErrorHandler("-", false);
 }
 

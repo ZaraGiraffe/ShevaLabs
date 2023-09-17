@@ -9,55 +9,82 @@ using namespace std;
 
 struct Node {
     string name;
-    bool is_terminal;
+    bool terminal;
+    bool null;
 
-    Node(string _name, bool terminal) {
+    Node(string _name, bool _terminal) {
         name = _name;
-        is_terminal = terminal;
+        terminal = _terminal || name == "@";
+        null = name == "@";
     }
 
-    Node() {}
+    Node() {
+        null = true;
+    }
 
+    Node(string _name) {
+        name = _name;
+        terminal = name[0] >= 'a';
+        null = name == "@";
+    }
+
+    bool operator==(const Node &other) const {
+        return other.name == name;
+    }
 };
 
 
 struct Rule {
     Node start;
     vector<Node> end;
-    vector<Node> unique_end;
-    bool isnt_recursive;
 
     Rule(Node _start, vector<Node> _end) {
         start = _start;
         end = _end;
-
-        auto comp = [] (const Node a, const Node b) {return a.name < b.name;};
-        unique_end = _end;
-        sort(unique_end.begin(), unique_end.end(), comp);
-        unique_end.erase(unique(unique_end.begin(), unique_end.end(), comp), unique_end.end());
-
-        isnt_recursive = true;
-        for (auto node : unique_end) {
-            if (!node.is_terminal) {
-                isnt_recursive = false;
-                break;
-            }
-        }
     }
 
     Rule() {}
 
-    string make_string(string delimeter = "") {
-        string res = start.name;
-        res.append("->");
+    string make_string(char delimeter = ',', bool all = true) {
+        string res = all ? start.name + "->" : "";
         for (int i = 0; i < end.size(); i++) {
             res.append(end[i].name);
             if (i != end.size() - 1)
-                res.append(delimeter);
+                res.push_back(delimeter);
         }
         return res;
     }
 
+    bool terminal() {
+        for (auto nod : end) {
+            if (!nod.terminal)
+                return false;
+        }
+        return true;
+    }
+
+    bool null() {
+        if (end.size() == 1 && end[0].null)
+            return true;
+        return false;
+    }
+
+    vector<int> find_positions(const Node nod) {
+        vector<int> res;
+        for (int i = 0; i < end.size(); i++) {
+            if (end[i] == nod)
+                res.push_back(i);
+        }
+        return res;
+    } 
+
+    bool operator<(const Rule &other) {
+        return start.name < other.start.name;
+    }
+
+    bool operator==(const Rule &other) {
+        return start == other.start && end == other.end;
+    }
 };
 
 #endif
