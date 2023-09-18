@@ -3,6 +3,7 @@
 
 #include<vector>
 #include<set>
+#include<string>
 
 using namespace std;
 
@@ -40,12 +41,10 @@ struct NodesGenerator {
 
     Node indexToNode(int index) {
         string res = "";
-        while (index >= 26) {
-            res.push_back('0' + (index % 10));
-            index /= 10;
-        }
-        res.push_back('A' + index);
-        reverse(res.begin(), res.end());
+        res.push_back('A' + (index % 26));
+        index /= 26;
+        if (index)
+            res += to_string(index);
         return Node(res);
     }
 
