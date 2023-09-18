@@ -17,8 +17,10 @@ struct NodesGenerator {
     NodesGenerator(vector<Rule> &rules) {
         for (auto rule : rules) {
             idx.insert(nodeToIndex(rule.start));
-            for (auto node : rule.end) 
+            for (auto node : rule.end) {
+                if (!node.terminal)
                 idx.insert(nodeToIndex(node));
+            }
         }
     }
 
