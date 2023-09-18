@@ -86,9 +86,19 @@ struct Rule {
         return start == other.start && end == other.end;
     }
 
-    bool contain_nodes(vector<Node> &nods) {
+    bool contain_two_nodes(vector<Node> &nods) {
+        if (nods.size() != 2)
+            return false;
         for (int i = 0; i < end.size() - 1; i++) {
             if (end[i] == nods[0] && end[i + 1] == nods[1]) 
+                return true;
+        }
+        return false;
+    }
+
+    bool contain_node(Node nod) {
+        for (auto rul : end) {
+            if (rul == nod) 
                 return true;
         }
         return false;
