@@ -96,7 +96,7 @@ void make_rules_smaller(vector<Rule> &rules, NodesGenerator &generator) {
         while (true) {
             ind = -1;
             for (int i = 0; i < rules.size(); i++) {
-                if (rules[i].end.size() > 2 && rules[i].contain_nodes(p)) {
+                if (rules[i].end.size() > 2 && rules[i].contain_two_nodes(p)) {
                     ind = i;
                     break;
                 }
@@ -111,18 +111,66 @@ void make_rules_smaller(vector<Rule> &rules, NodesGenerator &generator) {
             rules.push_back(new_rule);
         }
     }
+
+    normalize_rules(rules);
 }
 
-void normalize_small_rules(vector<Rule> &rules, NodesGenerator &generator) {
+Rule update_rule(Rule &rule, Node old_node, Node new_node) {
+    vector<Node> new_end;
+    for (int i = 0; i < rule.end.size(); i++) {
+        if (rule.end[i] == old_node)
+            new_end.push_back(new_node);
+        else 
+            new_end.push_back(rule.end[i]);
+    }
+    return Rule(rule.start, new_end);
+}
 
+void update_small_rules(vector<Rule> &rules, NodesGenerator &generator) {
+    while (true) {
+        Node term("@");
+        for (auto rule : rules) {
+            if (rule.end.size() == 2) {
+                if (rule.end[0].terminal) {
+                    term = rule.end[0];
+                    break;
+                }
+                else if (rule.end[1].terminal) {
+                    term = rule.end[1];
+                    break;
+                }
+            } 
+        }
+        if (term.null) 
+            break;
+        
+        Node new_node = generator.generate();
+        while (true) {
+            int ind = -1;
+            for (int i = 0; i < rules.size(); i++) {
+                if (rules[i].end.size() > 1 && rules[i].contain_node(term)) {
+                    ind = i;
+                    break;
+                }
+            }
+            if (ind == -1)
+                break;
+
+            Rule new_rule = update_rule(rules[ind], term, new_node);
+            rules.erase(rules.begin() + ind);
+            rules.push_back(new_rule);
+            vector<Node> small_end = {term};
+            rules.push_back(Rule(new_node, small_end));
+        }
+    }
+
+    normalize_rules(rules);
 }
 
 void chomsky_normal_form(vector<Rule> &rules) {
     NodesGenerator generator(rules);
     make_rules_smaller(rules, generator);
-    normalize_rules(rules);
-    normalize_small_rules(rules, generator);
-    normalize_rules(rules);
+    update_small_rules(rules, generator);
 }
 
 
