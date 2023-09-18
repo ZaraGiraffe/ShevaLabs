@@ -76,7 +76,7 @@ ErrorHandler parse_file(string filename, vector<Rule> &rules, char rules_delimet
     if (!fin.is_open()) 
         return ErrorHandler("The file path is not correct", true);
     
-    char buffer[100];
+    char buffer[1000];
     while (!fin.eof()) {
         fin.getline(buffer, sizeof(buffer));
         ErrorHandler ans = parse_line(string(buffer), rules, rules_delimeter, nodes_delimeter);
