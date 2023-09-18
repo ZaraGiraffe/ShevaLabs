@@ -24,7 +24,7 @@ struct Node {
 
     Node(string _name) {
         name = _name;
-        terminal = name[0] >= 'a';
+        terminal = name[0] >= 'a' || name == "@";
         null = name == "@";
     }
 
