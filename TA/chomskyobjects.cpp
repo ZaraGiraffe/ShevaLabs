@@ -85,6 +85,14 @@ struct Rule {
     bool operator==(const Rule &other) {
         return start == other.start && end == other.end;
     }
+
+    bool contain_nodes(pair<Node, Node> &nods) {
+        for (int i = 0; i < end.size() - 1; i++) {
+            if (end[i] == nods.first && end[i + 1] == nods.second) 
+                return true;
+        }
+        return false;
+    }
 };
 
 #endif
