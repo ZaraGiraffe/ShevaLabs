@@ -7,8 +7,6 @@
 
 using namespace std;
 
-char buffer[100];
-
 
 int main() {
 	vector<Rule> rules;
@@ -17,15 +15,14 @@ int main() {
     cout << check.message << '\n';
 
     if (!check.error) {
-        string outfilename = "./out_local";
-        //ofstream outstream(outfilename);
+        string outfile1 = "./withoutE";
+        string outfile2 = "./out_local";
 
         delete_null_rules(rules);
-        //sort(rules.begin(), rules.end());
-        print_all_rules(outfilename, rules);
-        
+        print_all_rules(outfile1, rules);
 
-        //for (auto i : rules)
-        //    outstream << i.make_string(',') << endl;
+        chomsky_normal_form(rules);
+        print_all_rules(outfile2, rules);
+        
     }
 }

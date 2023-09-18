@@ -8,6 +8,7 @@
 using namespace std;
 
 #include"chomskyobjects.cpp"
+#include"generator.cpp"
 
 
 void normalize_rules(vector<Rule> &rules) {
@@ -26,7 +27,8 @@ void print_all_rules(string filename, vector<Rule> &rules, char rules_delimeter 
                 outstream << rules[i].make_string(nodes_delimeter, i == l);
             }
             l = r;
-            outstream << '\n';
+            if (r != rules.size())
+                outstream << '\n';
         }
     }
     outstream.close();
@@ -59,6 +61,67 @@ void delete_null_rules(vector<Rule> &rules) {
             }
         }
     }
+    normalize_rules(rules);
+}
+
+Rule transform_rule(Rule rule, vector<Node> p, Node new_node) {
+    vector<Node> vec;
+    for (int i = 0; i < rule.end.size(); i++) {
+        if (i < rule.end.size() - 1 && rule.end[i] == p[0] && rule.end[i + 1] == p[1]) {
+            vec.push_back(new_node);
+            i++;
+        }
+        else 
+            vec.push_back(rule.end[i]);
+    }
+    return Rule(rule.start, vec);
+}
+
+void make_rules_smaller(vector<Rule> &rules, NodesGenerator &generator) {
+    while (true) {
+        int ind = -1;
+        for (int i = 0; i < rules.size(); i++) {
+            if (rules[i].end.size() > 2) {
+                ind = i; 
+                break; 
+            }
+        }
+        if (ind == -1)
+            break;
+        
+        int rsize = rules[ind].end.size();
+        vector<Node> p = {rules[ind].end[rsize-2], rules[ind].end[rsize-1]};
+        Node new_node = generator.generate();
+
+        while (true) {
+            ind = -1;
+            for (int i = 0; i < rules.size(); i++) {
+                if (rules[i].end.size() > 2 && rules[i].contain_nodes(p)) {
+                    ind = i;
+                    break;
+                }
+            }
+            if (ind == -1)
+                break;
+            
+            Rule changed_old_rule = transform_rule(rules[ind], p, new_node);
+            Rule new_rule(new_node, p);
+            rules.erase(rules.begin() + ind);
+            rules.push_back(changed_old_rule);
+            rules.push_back(new_rule);
+        }
+    }
+}
+
+void normalize_small_rules(vector<Rule> &rules, NodesGenerator &generator) {
+
+}
+
+void chomsky_normal_form(vector<Rule> &rules) {
+    NodesGenerator generator(rules);
+    make_rules_smaller(rules, generator);
+    normalize_rules(rules);
+    normalize_small_rules(rules, generator);
     normalize_rules(rules);
 }
 
