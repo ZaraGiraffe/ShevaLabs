@@ -1,5 +1,9 @@
 #include<stdio.h>
+#include<wchar.h>
+#include<stdlib.h>
 
+
+#include"HashMap.c"
 
 
 void save_characters(const char * filename, wchar_t* arr) {
@@ -32,6 +36,30 @@ void init_letters(const char *filename) {
 }
 
 
+int is_good_symbol(wchar_t ch) {
+    int check = 0;
+    for (int i = 0; letters[i]; i++) {
+        if (ch == letters[i]) {
+            check = 1;
+            break;
+        }
+    }
+    return check;
+}
+
+
+int is_consonant(wchar_t ch) {
+    int check = 0;
+    for (int i = 0; consonants[i]; i++) {
+        if (ch == consonants[i]) {
+            check = 1;
+            break;
+        }
+    }
+    return check;
+}
+
+
 void get_next_word(FILE* file, wchar_t* word, int word_length) {
     wchar_t ch = fgetwc(file);
     while (ch != (wchar_t)EOF && !is_good_symbol(ch)) 
@@ -57,37 +85,13 @@ void get_next_word(FILE* file, wchar_t* word, int word_length) {
 }
 
 
-int is_good_symbol(wchar_t ch) {
-    int check = 0;
-    for (int i = 0; letters[i]; i++) {
-        if (ch == letters[i]) {
-            check = 1;
-            break;
-        }
-    }
-    return check;
-}
-
-
-int is_consonant(wchar_t ch) {
-    int check = 0;
-    for (int i = 0; consonants[i]; i++) {
-        if (ch == consonants[i]) {
-            check = 1;
-            break;
-        }
-    }
-    return check;
-}
-
-
 
 int main() {
     init_consonants("./consonants.txt");
     init_letters("./letters.txt");
 
-    //FILE* infile = fopen("./letters.txt", "r, ccs=UTF-8");
-    //FILE* outfile = fopen("./letters.txt", "r, ccs=UTF-8");
+    //FILE* infile = fopen("./in_local.txt", "r, ccs=UTF-8");
+    //FILE* outfile = fopen("./out_local.txt", "w, ccs=UTF-8");
     
 }
 
