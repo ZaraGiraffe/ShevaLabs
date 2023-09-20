@@ -1,27 +1,36 @@
 #include<stdio.h>
 
 
-int is_good_symbol(wchar_t a) {
-    // Apostroph 39 in UTF-8
-    if (a == 38)
-        return 1;
-    // Big english letters 65 - 90 in UTF-8
-    if (a >= 65 && a <= 90) 
-        return 1;
-    // Small english letters 97 - 122 in UTF-8
-    if (a >= 97 && a <= 122)
-        return 1;
-    // Big and small cyrrilic letters 1040 - 1103 in UTF-8
-    if (a >= 1040 && a <= 1103)
-        return 1;
-    // Big cyrrilic letters (І Ї) 1030 - 1031 in UTF-8
-    if (a == 1030 || a == 1031)
-        return 1;
-    // Small cyrrilic letters (і ї) 1110 - 1111 in UTF-8
-    if (a == 1110 || a == 1111)
-        return 1;
-    return 0;
+
+void save_characters(const char * filename, wchar_t* arr) {
+    FILE* infile = fopen(filename, "r, ccs=UTF-8");
+    if (infile == NULL) 
+        printf("No "); //file does not open
+    for (int i = 0; ; i++) {
+        wchar_t ch = fgetwc(infile);
+        while (ch == '\n' || ch == ' ')
+            ch = fgetwc(infile);
+        if (ch == (wchar_t)EOF) {
+            arr[i] = 0;
+            break;
+        }
+        arr[i] = ch;
+    }
+    fclose(infile);
 }
+
+
+wchar_t consonants[200];
+void init_consonants(const char *filename) {
+    save_characters(filename, consonants);
+}
+
+
+wchar_t letters[200];
+void init_letters(const char *filename) {
+    save_characters(filename, letters);
+}
+
 
 
 void get_next_word(FILE* file, wchar_t* word, int word_length) {
@@ -50,14 +59,11 @@ void get_next_word(FILE* file, wchar_t* word, int word_length) {
 
 
 int main() {
-    FILE* file = fopen("in_local.txt", "r, ccs=UTF-8");
+    init_consonants("./consonants.txt");
+    init_letters("./letters.txt");
 
-    wchar_t word[31];
-
-    int it = 0;
-
-    while (1) {
-        
-    }
+    //FILE* infile = fopen("./letters.txt", "r, ccs=UTF-8");
+    //FILE* outfile = fopen("./letters.txt", "r, ccs=UTF-8");
+    
 }
 
