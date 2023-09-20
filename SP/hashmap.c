@@ -24,7 +24,7 @@ void init_hashmap(struct HashMap* hashmap) {
 }
 
 
-int hash_djb2(wchar_t* word) {
+int hash_djb2(const wchar_t* word) {
     unsigned int hash_num = 5381;
     int c = 0;
     while(*word) {
@@ -36,11 +36,13 @@ int hash_djb2(wchar_t* word) {
 }
 
 
-void add_word_to_hashmap(struct HashMap* hashmap, wchar_t* word) {
+void add_word_to_hashmap(struct HashMap* hashmap, const wchar_t* word) {
     int pos = hash_djb2(word);
     struct Node* new_node = (struct Node *)malloc(sizeof(struct Node));
     new_node->next = NULL;
-    new_node->word = word;
+    wchar_t* new_word = (wchar_t*)malloc(sizeof(wchar_t) * (wcslen(word) + 1));
+    wcscpy(new_word, word);
+    new_node->word = new_word;
     struct Node* now = hashmap->array[pos];
     if (now == NULL) {
         hashmap->array[pos] = new_node;
@@ -52,7 +54,7 @@ void add_word_to_hashmap(struct HashMap* hashmap, wchar_t* word) {
 }
 
 
-int is_in_hashmap(struct HashMap* hashmap, wchar_t* word) {
+int is_in_hashmap(const struct HashMap* hashmap, const wchar_t* word) {
     int pos = hash_djb2(word);
     struct Node* node = hashmap->array[pos];
     if (node == NULL)

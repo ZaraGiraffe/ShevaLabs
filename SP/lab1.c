@@ -9,8 +9,6 @@
 
 void save_characters(const char * filename, wchar_t* arr) {
     FILE* infile = fopen(filename, "r, ccs=UTF-8");
-    if (infile == NULL) 
-        printf("No "); //file does not open
     for (int i = 0; ; i++) {
         wchar_t ch = fgetwc(infile);
         while (ch == '\n' || ch == ' ')
@@ -97,7 +95,7 @@ int count_consonants(wchar_t* word) {
 }
 
 
-int find_maximum_consonants(char* filename) {
+int find_maximum_consonants(const char* filename) {
     FILE* infile = fopen(filename, "r, ccs=UTF-8");
     int maxi = 0;
     wchar_t word[WORD_LENGTH];
@@ -113,6 +111,33 @@ int find_maximum_consonants(char* filename) {
 }
 
 
+void add_words_to_hashmap_from_file(const char* filename, struct HashMap* hashmap, int num_cons) {
+    FILE* infile = fopen(filename, "r, ccs=UTF-8");
+    wchar_t word[WORD_LENGTH];
+    get_next_word(infile, word);
+    while (word[0]) {
+        if (count_consonants(word) == num_cons && !is_in_hashmap(hashmap, word)) 
+            add_word_to_hashmap(hashmap, word);
+        get_next_word(infile, word);
+    }
+    fclose(infile);
+}
+
+
+void print_all_words_from_hashmap(const char* filename, const struct HashMap* hashmap) {
+    FILE* outfile = fopen(filename, "w, ccs=UTF-8");
+    for (int i = 0; i < SIZE; i++) {
+        struct Node* now = hashmap->array[i];
+        while (now != NULL) {
+            fwprintf(outfile, now->word);
+            fputwc('\n', outfile);
+            now = now->next;
+        }
+    }
+    fclose(outfile);
+}
+
+
 int main() {
     init_consonants("./consonants.txt");
     init_letters("./letters.txt");
@@ -120,7 +145,9 @@ int main() {
     //FILE* infile = fopen("./in_local.txt", "r, ccs=UTF-8");
     //FILE* outfile = fopen("./out_local.txt", "w, ccs=UTF-8");
     
-    int cnt = find_maximum_consonants("./in_local.txt");
-    printf("%d\n", cnt);
+    int maxi_cons = find_maximum_consonants("./in_local.txt");
+    struct HashMap hashmap;
+    init_hashmap(&hashmap);
+    add_words_to_hashmap_from_file("./in_local.txt", &hashmap, maxi_cons);
+    print_all_words_from_hashmap("./out_local.txt", &hashmap);
 }
-
