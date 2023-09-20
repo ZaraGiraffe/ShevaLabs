@@ -32,7 +32,6 @@ void init_letters(const char *filename) {
 }
 
 
-
 void get_next_word(FILE* file, wchar_t* word, int word_length) {
     wchar_t ch = fgetwc(file);
     while (ch != (wchar_t)EOF && !is_good_symbol(ch)) 
@@ -56,6 +55,31 @@ void get_next_word(FILE* file, wchar_t* word, int word_length) {
         ch = fgetwc(file);
     }
 }
+
+
+int is_good_symbol(wchar_t ch) {
+    int check = 0;
+    for (int i = 0; letters[i]; i++) {
+        if (ch == letters[i]) {
+            check = 1;
+            break;
+        }
+    }
+    return check;
+}
+
+
+int is_consonant(wchar_t ch) {
+    int check = 0;
+    for (int i = 0; consonants[i]; i++) {
+        if (ch == consonants[i]) {
+            check = 1;
+            break;
+        }
+    }
+    return check;
+}
+
 
 
 int main() {
