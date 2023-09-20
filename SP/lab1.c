@@ -23,14 +23,41 @@ int is_good_symbol(wchar_t a) {
     return 0;
 }
 
-int main() {
-    
-    FILE* file = fopen("in_local.txt", "r, ccs=UTF-8");
 
-    fclose(file);
-
-    
-
+void get_next_word(FILE* file, wchar_t* word, int word_length) {
+    wchar_t ch = fgetwc(file);
+    while (ch != (wchar_t)EOF && !is_good_symbol(ch)) 
+        ch = fgetwc(file);
+    if (ch == (wchar_t)EOF) {
+        word[0] = 0;
+        return;
+    }
+    int pos = 0;
+    while (1) {
+        if (!is_good_symbol(ch)) {
+            word[pos] = 0;
+            break;
+        }
+        word[pos] = ch;
+        pos++;
+        if (pos == word_length - 1) {
+            word[pos] = 0;
+            break;
+        }
+        ch = fgetwc(file);
+    }
 }
 
+
+int main() {
+    FILE* file = fopen("in_local.txt", "r, ccs=UTF-8");
+
+    wchar_t word[31];
+
+    int it = 0;
+
+    while (1) {
+        
+    }
+}
 
