@@ -2,8 +2,9 @@
 #include<wchar.h>
 #include<stdlib.h>
 
-
 #include"HashMap.c"
+
+#define WORD_LENGTH 30
 
 
 void save_characters(const char * filename, wchar_t* arr) {
@@ -60,7 +61,7 @@ int is_consonant(wchar_t ch) {
 }
 
 
-void get_next_word(FILE* file, wchar_t* word, int word_length) {
+void get_next_word(FILE* file, wchar_t* word) {
     wchar_t ch = fgetwc(file);
     while (ch != (wchar_t)EOF && !is_good_symbol(ch)) 
         ch = fgetwc(file);
@@ -76,7 +77,7 @@ void get_next_word(FILE* file, wchar_t* word, int word_length) {
         }
         word[pos] = ch;
         pos++;
-        if (pos == word_length - 1) {
+        if (pos == WORD_LENGTH - 1) {
             word[pos] = 0;
             break;
         }
@@ -84,6 +85,32 @@ void get_next_word(FILE* file, wchar_t* word, int word_length) {
     }
 }
 
+
+int count_consonants(wchar_t* word) {
+    int cnt = 0;
+    while (*word) {
+        if (is_consonant(*word))
+            cnt++;
+        word++;
+    }
+    return cnt;
+}
+
+
+int find_maximum_consonants(char* filename) {
+    FILE* infile = fopen(filename, "r, ccs=UTF-8");
+    int maxi = 0;
+    wchar_t word[WORD_LENGTH];
+    get_next_word(infile, word);
+    while (word[0]) {
+        int cnt = count_consonants(word);
+        if (cnt > maxi)
+            maxi = cnt;
+        get_next_word(infile, word);
+    }
+    fclose(infile);
+    return maxi;
+}
 
 
 int main() {
@@ -93,5 +120,7 @@ int main() {
     //FILE* infile = fopen("./in_local.txt", "r, ccs=UTF-8");
     //FILE* outfile = fopen("./out_local.txt", "w, ccs=UTF-8");
     
+    int cnt = find_maximum_consonants("./in_local.txt");
+    printf("%d\n", cnt);
 }
 

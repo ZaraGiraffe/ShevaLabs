@@ -4,21 +4,25 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+#define SIZE 10000
+
+
 struct Node {
     struct Node* next;
     wchar_t* word;
 };
 
-#define SIZE 100000
 
 struct HashMap {
     struct Node* array[SIZE];
 };
 
+
 void init_hashmap(struct HashMap* hashmap) {
     for (int i = 0; i < SIZE; i++)
         hashmap->array[i] = NULL;
 }
+
 
 int hash_djb2(wchar_t* word) {
     unsigned int hash_num = 5381;
