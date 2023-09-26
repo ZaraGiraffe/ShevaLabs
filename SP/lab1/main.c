@@ -142,9 +142,6 @@ int main() {
     init_consonants("./consonants.txt");
     init_letters("./letters.txt");
 
-    //FILE* infile = fopen("./in_local.txt", "r, ccs=UTF-8");
-    //FILE* outfile = fopen("./out_local.txt", "w, ccs=UTF-8");
-    
     int maxi_cons = find_maximum_consonants("./in_local.txt");
     struct HashMap hashmap;
     init_hashmap(&hashmap);
