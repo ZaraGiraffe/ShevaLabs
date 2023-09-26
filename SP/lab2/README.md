@@ -1,0 +1,1 @@
+I have to create a Finite Automata implementation and create a program that can check whether the automata can produce a word word $w_1uw_2$ where $w_1$ and $w_2$ are given words and $u$ is any word

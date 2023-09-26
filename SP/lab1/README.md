@@ -1,0 +1,1 @@
+The task is to find all unique words in the file that have the most number of consonants. I decoded to implement it in C to learn C a bit
