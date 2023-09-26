@@ -1,7 +1,8 @@
 #include<iostream> 
 #include<fstream>
-#include"./automata.cpp"
 #include<set>
+
+#include"./automata.cpp"
 
 using namespace std;
 
