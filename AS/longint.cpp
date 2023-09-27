@@ -36,9 +36,9 @@ struct long_int {
         }
     }
 
-    void normilize() {
-        while (X.size() > 1 && X.back() == 0)
-            X.pop_back();
+    void normalize(vector<int>& mas) const {
+        while (mas.size() > 1 && mas.back() == 0)
+            mas.pop_back();
     }
 
     static bool equal(const vector<int>& a, const vector<int>& b) {
@@ -106,7 +106,7 @@ struct long_int {
         return X.size() == 1 && X[0] == 0 ? true : false;
     }
 
-    static vector<int> add(const vector<int>& u, const vector<int>& v) {
+    vector<int> add(const vector<int>& u, const vector<int>& v) const {
         vector<int> res;
         for (int i = 0, dop = 0; i < max(v.size(), u.size()) || dop; i++) {
             int u1 = i < u.size() ? u[i] : 0;
@@ -123,7 +123,7 @@ struct long_int {
         return res;
     }
 
-    static vector<int> sub(const vector<int>& u, const vector<int>& v) {
+    vector<int> sub(const vector<int>& u, const vector<int>& v) const {
         vector<int> res;
         for (int i = 0, dop = 0; i < u.size(); i++) {
             int v1 = i < v.size() ? v[i] : 0;
@@ -136,8 +136,7 @@ struct long_int {
                 dop = 0;
             res.push_back(now);
         }
-        while (res.size() > 1 && res.back() == 0) 
-            res.pop_back();
+        normalize(res);
         return res;
     }
 
@@ -170,6 +169,75 @@ struct long_int {
     void operator-=(const long_int& other) {
         *this = *this - other;
     }
+
+    vector<int> mul(const vector<int>& a, const vector<int>& b) const {
+        vector<int> res(a.size() + b.size());
+        for (int i = 0; i < a.size(); i++) {
+            for (int j = 0, dop = 0; dop || j < b.size(); j++) {
+                int bj = j < b.size() ? b[j] : 0;
+                int suma = a[i] * bj + dop + res[i + j];
+                res[i + j] = suma % BASE;
+                dop = suma / BASE;
+            }
+        }
+        normalize(res);
+        return res;
+    }
+
+    long_int operator*(const long_int& other) const {
+        long_int res;
+        res.X = mul(X, other.X);
+        res.sign = sign ^ other.sign;
+        return res;
+    }
+
+    void operator*=(const long_int& other) {
+        *this = *this * other;
+    }
+
+    vector<int> divide_2(vector<int> arr) const {
+        vector<int> mas = arr;
+        for (int i = mas.size() - 1, dop = 0; i >= 0; i--) {
+            int now = dop * BASE + mas[i];
+            dop = now & 1;
+            mas[i] = now / 2;
+        }
+        normalize(mas);
+        return mas;
+    }
+
+    void vcout(vector<int> v) const {
+    for (auto i : v) 
+        cout << i << " ";
+    }
+
+    vector<int> divide(const vector<int>& a, const vector<int>& b) const {
+        vector<int> l = {0};
+        vector<int> r = a;
+        vector<int> one = {1};
+        while (l != r) {
+            vector<int> m = divide_2(add(add(l, r), one));
+            if (less(a, mul(m, b)))
+                r = sub(m, one);
+            else 
+                l = m;
+        }
+        return l;
+    }
+
+    long_int operator/(const long_int& other) const {
+        if (!other) 
+            return long_int(0);
+        long_int res;
+        res.X = divide(X, other.X);
+        res.sign = sign ^ other.sign;
+        return res;
+    }
+
+    void operator/=(const long_int& other) {
+        *this = *this / other;
+    }
+
     
     string str() const {
         string res;
