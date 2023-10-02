@@ -65,12 +65,11 @@ vector<Lexem> build_lexems(const char* filename) {
         now.push_back(file.get());
 
         if (is_space(now)) {
-            now.clear();
+
         }
 
         else if (is_punctuation(now)) {
             lexems.push_back(Lexem(now, "Punctuation"));
-            now.clear();
         }
 
         else if (now == ".") {
@@ -86,11 +85,14 @@ vector<Lexem> build_lexems(const char* filename) {
                 case 3:
                     lexems.push_back(Lexem(now, "Special token"));
             }
+            
         }
 
         else if (0) {
 
         }
+
+        now.clear();
     }
 
     file.close();
@@ -99,11 +101,11 @@ vector<Lexem> build_lexems(const char* filename) {
 
 
 
-void print_lexems(const char* filename, const vector<Lexem>& lexems, int in_row=5) {
+void print_lexems(const char* filename, const vector<Lexem>& lexems, int in_row=2) {
     ofstream file(filename);
     for (int i = 0; i < lexems.size(); i++) {
         file << lexems[i].to_str();
-        file << (in_row == 0) || (i % in_row) ? " " : "\n";
+        file << ((in_row == 0) || (i % in_row == 0) ? " " : "\n");
     }
     file.close();
 }
@@ -118,6 +120,7 @@ void init_symbols() {
 
 
 int main() {
+    init_symbols();
     vector<Lexem> lexems = build_lexems("./local.js");
     cout << lexems.size() << endl;
     print_lexems("./out_local.js", lexems);
