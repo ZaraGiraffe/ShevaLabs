@@ -2,6 +2,7 @@
 #include<fstream>
 #include<vector>
 #include<set>
+#include<iostream>
 
 using namespace std;
 
@@ -17,7 +18,7 @@ struct Lexem {
         type = _type;
     }
 
-    string to_str() {
+    string to_str() const {
         return "<" + name + ", " + type + ">";
     }
 };
@@ -88,7 +89,7 @@ vector<Lexem> build_lexems(const char* filename) {
         }
 
         else if (0) {
-            
+
         }
     }
 
@@ -97,12 +98,27 @@ vector<Lexem> build_lexems(const char* filename) {
 }
 
 
+
+void print_lexems(const char* filename, const vector<Lexem>& lexems, int in_row=5) {
+    ofstream file(filename);
+    for (int i = 0; i < lexems.size(); i++) {
+        file << lexems[i].to_str();
+        file << (in_row == 0) || (i % in_row) ? " " : "\n";
+    }
+    file.close();
+}
+
+
+
 void init_symbols() {
     init_punctuation("./punctuation.txt");
     init_spaces();
 }
 
 
-int main() {
 
+int main() {
+    vector<Lexem> lexems = build_lexems("./local.js");
+    cout << lexems.size() << endl;
+    print_lexems("./out_local.js", lexems);
 }
