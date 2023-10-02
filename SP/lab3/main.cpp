@@ -85,11 +85,15 @@ vector<Lexem> build_lexems(const char* filename) {
                 case 3:
                     lexems.push_back(Lexem(now, "Special token"));
             }
-            
+
         }
 
-        else if (0) {
-
+        else if (now == "\"" || now == "'") {
+            while (file.peek() != EOF && file.peek() != now[0]) 
+                now.push_back(file.get());
+            now.push_back(now[0]);
+            file.get();
+            lexems.push_back(Lexem(now, "string"));
         }
 
         now.clear();
