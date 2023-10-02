@@ -26,8 +26,8 @@ struct Lexem {
 
 set<string> punctuations;
 
-void init_punctuation() {
-    ifstream punctuation_file("./brackets");
+void init_punctuation(const char* filename) {
+    ifstream punctuation_file(filename);
     while(punctuation_file.peek() != EOF) {
         char br = punctuation_file.get();
         punctuations.insert(string(1, br));
@@ -88,7 +88,7 @@ vector<Lexem> build_lexems(const char* filename) {
         }
 
         else if (0) {
-
+            
         }
     }
 
@@ -98,7 +98,8 @@ vector<Lexem> build_lexems(const char* filename) {
 
 
 void init_symbols() {
-    
+    init_punctuation("./punctuation.txt");
+    init_spaces();
 }
 
 
