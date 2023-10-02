@@ -300,6 +300,13 @@ vector<Lexem> build_lexems(const char* filename) {
             else 
                 lexems.push_back(Lexem(now, UNK));
         }
+
+        else {
+            #if DEBUG
+            cdeb << "in else" << endl;
+            #endif
+            lexems.push_back(Lexem(now, UNK));
+        }
         
         #if DEBUG
         cdeb << "end " << now << endl;
