@@ -71,6 +71,21 @@ int is_character(const string& now) {
 
 
 
+set<string> digits;
+
+void init_digits(const char* filename) {
+    ifstream file(filename);
+    while (file.peek() != EOF)
+        digits.insert(string(1, file.get()));
+    file.close();
+}
+
+int is_digit(const string& now) {
+    return digits.find(now) == digits.end();
+}
+
+
+
 vector<Lexem> build_lexems(const char* filename) {
     ifstream file(filename);
     vector<Lexem> lexems;
@@ -120,6 +135,7 @@ vector<Lexem> build_lexems(const char* filename) {
         }
 
 
+
         now.clear();
     }
 
@@ -142,6 +158,8 @@ void print_lexems(const char* filename, const vector<Lexem>& lexems, int in_row=
 
 void init_symbols() {
     init_punctuation("./punctuation.txt");
+    init_characters("./characters.txt");
+    init_digits("./digits.txt");
     init_spaces();
 }
 
