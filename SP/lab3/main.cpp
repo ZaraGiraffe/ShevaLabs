@@ -68,6 +68,26 @@ vector<Lexem> build_lexems(const char* filename) {
         }
 
         else if (is_punctuation(now)) {
+            lexems.push_back(Lexem(now, "Punctuation"));
+            now.clear();
+        }
+
+        else if (now == ".") {
+            while (file.peek() == '.' && now.size() < 3)
+                now.push_back(file.get());
+            switch (now.size()) {
+                case 1:
+                    lexems.push_back(Lexem(now, "Member Access"));
+                    break;
+                case 2:
+                    lexems.push_back(Lexem(now, "Unknown token"));
+                    break;
+                case 3:
+                    lexems.push_back(Lexem(now, "Special token"));
+            }
+        }
+
+        else if (0) {
 
         }
     }
