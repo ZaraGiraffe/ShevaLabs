@@ -20,6 +20,14 @@ using namespace std;
 #define KEYW "Keyword"
 
 
+#define DEBUG 1
+
+
+#if DEBUG
+ofstream cdeb;
+#endif
+
+
 struct Lexem {
     string name = "";
     string type = "";
@@ -137,16 +145,22 @@ vector<Lexem> build_lexems(const char* filename) {
         now.push_back(file.get());
 
         if (is_space(now)) {
-            cout << "in space" << endl;
+            #if DEBUG
+            cdeb << "in space" << endl;
+            #endif
         }
 
         else if (is_punctuation(now)) {
-            cout << "in punkt" << endl;
+            #if DEBUG
+            cdeb << "in punkt" << endl;
+            #endif
             lexems.push_back(Lexem(now, PUNKT));
         }
 
         else if (now == ".") {
-            cout << "in dot" << endl;
+            #if DEBUG
+            cdeb << "in dot" << endl;
+            #endif
             while (file.peek() == '.' && now.size() < 3)
                 now.push_back(file.get());
             switch (now.size()) {
@@ -163,7 +177,9 @@ vector<Lexem> build_lexems(const char* filename) {
         }
 
         else if (now == "\"" || now == "'") {
-            cout << "in string" << endl;
+            #if DEBUG
+            cdeb << "in string" << endl;
+            #endif
             while (file.peek() != EOF && file.peek() != now[0]) 
                 now.push_back(file.get());
             file.get();
@@ -171,15 +187,21 @@ vector<Lexem> build_lexems(const char* filename) {
         }
 
         else if (now == "/") {
-            cout << "in div" << endl;
+            #if DEBUG
+            cdeb << "in div" << endl;
+            #endif
             if (file.peek() == '/') {
-                cout << "\tin comm1" << endl;
+                #if DEBUG
+                cdeb << "\tin comm1" << endl;
+                #endif
                 while(file.peek() != EOF && file.peek() != '\n') 
                     now.push_back(file.get()); 
                 lexems.push_back(Lexem(now.substr(2), COM));
             } 
             else if (file.peek() == '*') {
-                cout << "\tin comm2" << endl;
+                #if DEBUG
+                cdeb << "\tint comm2" << endl;
+                #endif
                 now.push_back(file.get());
                 while (file.peek() != EOF) {
                     now.push_back(file.get());
@@ -190,13 +212,17 @@ vector<Lexem> build_lexems(const char* filename) {
                 lexems.push_back(Lexem(now.substr(2, now.size()-4), COM));
             }
             else if (!lexems.empty() && (lexems.back().name == ")" || lexems.back().name == "]" || lexems.back().type == OBJ)) {
-                cout << "\tin oper" << endl;
+                #if DEBUG
+                cdeb << "\tin oper" << endl;
+                #endif
                 if (file.peek() == '=') 
                     now.push_back(file.get());
                 lexems.push_back(Lexem(now, OPER));
             }
             else {
-                cout << "\tin pattern" << endl;
+                #if DEBUG
+                cdeb << "in pattern" << endl;
+                #endif
                 while (file.peek() != EOF && file.peek() != '/') 
                     now.push_back(file.get());
                 now.push_back(file.get());
@@ -207,16 +233,22 @@ vector<Lexem> build_lexems(const char* filename) {
         }
 
         else if (is_digit(now)) {
-            cout << "in digit" << endl;
+            #if DEBUG
+            cdeb << "in digit" << endl;
+            #endif
             if ((now == "0") && (file.peek() == 'x')) {
-                cout << "\t in hex" << endl;
+                #if DEBUG
+                cdeb << "\t in hex" << endl;
+                #endif
                 now.push_back(file.get());
                 while (is_hex_digit(string(1, file.peek())))
                     now.push_back(file.get());
                 lexems.push_back(Lexem(now, NUM));
             }
             else {
-                cout << "\t in norm digit" << endl;
+                #if DEBUG
+                cdeb << "\tin norm digit" << endl;
+                #endif
                 int point = 0;
                 while (is_digit(string(1, file.peek())) || (!point && (file.peek() == '.'))) {
                     if (file.peek() == '.')
@@ -228,7 +260,9 @@ vector<Lexem> build_lexems(const char* filename) {
         }
 
         else if (is_character(now)) {
-            cout << "in char" << endl;
+            #if DEBUG
+            cdeb << "in char" << endl;
+            #endif
             while (is_character(string(1, file.peek())) || is_digit(string(1, file.peek()))) 
                 now.push_back(file.get());
             if (is_keyword(now)) 
@@ -236,7 +270,10 @@ vector<Lexem> build_lexems(const char* filename) {
             else lexems.push_back(Lexem(now, OBJ));
         }
 
-        cout << "end " << now << endl;
+        
+        #if DEBUG
+        cdeb << "end " << now << endl;
+        #endif
 
         now.clear();
     }
@@ -270,8 +307,15 @@ void init_symbols() {
 
 
 int main() {
+    #if DEBUG 
+    cdeb.open("./debug_local.txt");
+    #endif
+
     init_symbols();
     vector<Lexem> lexems = build_lexems("./local.js");
-    cout << lexems.size() << endl;
     print_lexems("./out_local.txt", lexems);
+
+    #if DEBUG 
+    cdeb << "size: " << lexems.size() << endl;
+    #endif
 }
