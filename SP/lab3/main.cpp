@@ -7,6 +7,17 @@
 using namespace std;
 
 
+#define PUNKT "Puntuation"
+#define UNK "Unknown token"
+#define MEMA "Member Access"
+#define SPEC "Special token"
+#define STR "String"
+#define OBJ "User Object"
+#define OPER "Operator"
+#define PAT "Pattern"
+#define COM "comment"
+
+
 struct Lexem {
     string name = "";
     string type = "";
@@ -95,43 +106,74 @@ vector<Lexem> build_lexems(const char* filename) {
         now.push_back(file.get());
 
         if (is_space(now)) {
-
+            cout << "in space" << endl;
         }
 
         else if (is_punctuation(now)) {
-            lexems.push_back(Lexem(now, "Punctuation"));
+            cout << "in punkt" << endl;
+            lexems.push_back(Lexem(now, PUNKT));
         }
 
         else if (now == ".") {
+            cout << "in dot" << endl;
             while (file.peek() == '.' && now.size() < 3)
                 now.push_back(file.get());
             switch (now.size()) {
                 case 1:
-                    lexems.push_back(Lexem(now, "Member Access"));
+                    lexems.push_back(Lexem(now, MEMA));
                     break;
                 case 2:
-                    lexems.push_back(Lexem(now, "Unknown token"));
+                    lexems.push_back(Lexem(now, UNK));
                     break;
                 case 3:
-                    lexems.push_back(Lexem(now, "Special token"));
+                    lexems.push_back(Lexem(now, SPEC));
             }
 
         }
 
         else if (now == "\"" || now == "'") {
+            cout << "in string" << endl;
             while (file.peek() != EOF && file.peek() != now[0]) 
                 now.push_back(file.get());
             file.get();
-            lexems.push_back(Lexem(now.substr(1), "string"));
+            lexems.push_back(Lexem(now.substr(1), STR));
         }
 
         else if (now == "/") {
+            cout << "in div" << endl;
             if (file.peek() == '/') {
+                cout << "\tin comm1" << endl;
                 now.pop_back();
                 while(file.peek() != EOF && file.peek() != '\n') 
                     now.push_back(file.get()); 
+                lexems.push_back(Lexem(now, COM));
+            } 
+            else if (file.peek() == '*') {
+                cout << "\tin comm2" << endl;
+                now.pop_back();
+                while (file.peek() != EOF) {
+                    now.push_back(file.get());
+                    if (now.size() >= 2 && now.substr(now.size()-2, 2) == "*/") {
+                        now.pop_back(); now.pop_back();
+                        break;
+                    } 
+                }
+                lexems.push_back(Lexem(now, COM));
             }
-            
+            else if (!lexems.empty() && (lexems.back().name == ")" || lexems.back().name == "]" || lexems.back().type == OBJ)) {
+                cout << "\tin oper" << endl;
+                if (file.peek() == '=') 
+                    now.push_back(file.get());
+                lexems.push_back(Lexem(now, OPER));
+            }
+            else {
+                cout << "\tin pattern" << endl;
+                while (file.peek() != EOF && file.peek() != '/') 
+                    now.push_back(file.get());
+                if (is_character(string(1, file.peek())))
+                    now.push_back(file.get());
+                lexems.push_back(Lexem(now, PAT));
+            }
         }
 
 
