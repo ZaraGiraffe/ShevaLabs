@@ -7,7 +7,7 @@
 using namespace std;
 
 
-#define PUNKT "Puntuation"
+#define PUNKT "Punctuation"
 #define UNK "Unknown token"
 #define MEMA "Member Access"
 #define SPEC "Special token"
@@ -20,7 +20,7 @@ using namespace std;
 #define KEYW "Keyword"
 
 
-#define DEBUG 1
+#define DEBUG 0
 
 
 #if DEBUG
@@ -326,7 +326,7 @@ void print_lexems(const char* filename, const vector<Lexem>& lexems, int in_row=
 
 
 void init_symbols() {
-    init_punctuation("./punctuation.txt");
+    init_punctuation("./punctuations.txt");
     init_characters("./characters.txt");
     init_digits("./digits.txt");
     init_keywords("./keywords.txt");
