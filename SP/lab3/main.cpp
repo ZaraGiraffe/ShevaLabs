@@ -15,7 +15,9 @@ using namespace std;
 #define OBJ "User Object"
 #define OPER "Operator"
 #define PAT "Pattern"
-#define COM "comment"
+#define COM "Comment"
+#define NUM "Number"
+#define KEYW "Keyword"
 
 
 struct Lexem {
@@ -33,6 +35,19 @@ struct Lexem {
         return "<" + name + ", " + type + ">";
     }
 };
+
+
+set<string> hexes;
+
+int init_hexes(const char* filename) {
+    ifstream file(filename);
+    while (file.peek() != EOF)
+        hexes.insert(string(1, file.get()));
+}
+
+int is_hex_digit(string digit) {
+    return hexes.find(digit) != hexes.end();
+}
 
 
 
@@ -77,7 +92,23 @@ void init_characters(const char* filename) {
 }
 
 int is_character(const string& now) {
-    return characters.find(now) == characters.end();
+    return characters.find(now) != characters.end();
+}
+
+
+
+set<string> keywords;
+
+void init_keywords(const char* filename) {
+    ifstream file(filename);
+    string word;
+    while (file >> word) 
+        keywords.insert(word);
+    file.close();
+}
+
+int is_keyword(const string& now) {
+    return keywords.find(now) != keywords.end();
 }
 
 
@@ -92,7 +123,7 @@ void init_digits(const char* filename) {
 }
 
 int is_digit(const string& now) {
-    return digits.find(now) == digits.end();
+    return digits.find(now) != digits.end();
 }
 
 
@@ -143,22 +174,20 @@ vector<Lexem> build_lexems(const char* filename) {
             cout << "in div" << endl;
             if (file.peek() == '/') {
                 cout << "\tin comm1" << endl;
-                now.pop_back();
                 while(file.peek() != EOF && file.peek() != '\n') 
                     now.push_back(file.get()); 
-                lexems.push_back(Lexem(now, COM));
+                lexems.push_back(Lexem(now.substr(2), COM));
             } 
             else if (file.peek() == '*') {
                 cout << "\tin comm2" << endl;
-                now.pop_back();
+                now.push_back(file.get());
                 while (file.peek() != EOF) {
                     now.push_back(file.get());
-                    if (now.size() >= 2 && now.substr(now.size()-2, 2) == "*/") {
-                        now.pop_back(); now.pop_back();
+                    if (now.size() >= 4 && now.substr(now.size()-2, 2) == "*/") 
                         break;
-                    } 
+
                 }
-                lexems.push_back(Lexem(now, COM));
+                lexems.push_back(Lexem(now.substr(2, now.size()-4), COM));
             }
             else if (!lexems.empty() && (lexems.back().name == ")" || lexems.back().name == "]" || lexems.back().type == OBJ)) {
                 cout << "\tin oper" << endl;
@@ -170,13 +199,44 @@ vector<Lexem> build_lexems(const char* filename) {
                 cout << "\tin pattern" << endl;
                 while (file.peek() != EOF && file.peek() != '/') 
                     now.push_back(file.get());
+                now.push_back(file.get());
                 if (is_character(string(1, file.peek())))
                     now.push_back(file.get());
                 lexems.push_back(Lexem(now, PAT));
             }
         }
 
+        else if (is_digit(now)) {
+            cout << "in digit" << endl;
+            if ((now == "0") && (file.peek() == 'x')) {
+                cout << "\t in hex" << endl;
+                now.push_back(file.get());
+                while (is_hex_digit(string(1, file.peek())))
+                    now.push_back(file.get());
+                lexems.push_back(Lexem(now, NUM));
+            }
+            else {
+                cout << "\t in norm digit" << endl;
+                int point = 0;
+                while (is_digit(string(1, file.peek())) || (!point && (file.peek() == '.'))) {
+                    if (file.peek() == '.')
+                        point = 1;
+                    now.push_back(file.get());
+                }
+                lexems.push_back(Lexem(now, NUM));
+            }
+        }
 
+        else if (is_character(now)) {
+            cout << "in char" << endl;
+            while (is_character(string(1, file.peek())) || is_digit(string(1, file.peek()))) 
+                now.push_back(file.get());
+            if (is_keyword(now)) 
+                lexems.push_back(Lexem(now, KEYW));
+            else lexems.push_back(Lexem(now, OBJ));
+        }
+
+        cout << "end " << now << endl;
 
         now.clear();
     }
@@ -202,7 +262,9 @@ void init_symbols() {
     init_punctuation("./punctuation.txt");
     init_characters("./characters.txt");
     init_digits("./digits.txt");
+    init_keywords("./keywords.txt");
     init_spaces();
+    init_hexes("./hexdigits.txt");
 }
 
 
@@ -211,5 +273,5 @@ int main() {
     init_symbols();
     vector<Lexem> lexems = build_lexems("./local.js");
     cout << lexems.size() << endl;
-    print_lexems("./out_local.js", lexems);
+    print_lexems("./out_local.txt", lexems);
 }
