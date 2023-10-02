@@ -56,6 +56,21 @@ int is_space(const string& now) {
 
 
 
+set<string> characters;
+
+void init_characters(const char* filename) {
+    ifstream file(filename);
+    while (file.peek() != EOF)
+        characters.insert(string(1, file.get()));
+    file.close();
+}
+
+int is_character(const string& now) {
+    return characters.find(now) == characters.end();
+}
+
+
+
 vector<Lexem> build_lexems(const char* filename) {
     ifstream file(filename);
     vector<Lexem> lexems;
@@ -91,10 +106,19 @@ vector<Lexem> build_lexems(const char* filename) {
         else if (now == "\"" || now == "'") {
             while (file.peek() != EOF && file.peek() != now[0]) 
                 now.push_back(file.get());
-            now.push_back(now[0]);
             file.get();
-            lexems.push_back(Lexem(now, "string"));
+            lexems.push_back(Lexem(now.substr(1), "string"));
         }
+
+        else if (now == "/") {
+            if (file.peek() == '/') {
+                now.pop_back();
+                while(file.peek() != EOF && file.peek() != '\n') 
+                    now.push_back(file.get()); 
+            }
+            
+        }
+
 
         now.clear();
     }
