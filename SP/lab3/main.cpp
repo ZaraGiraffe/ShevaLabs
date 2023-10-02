@@ -136,6 +136,21 @@ int is_digit(const string& now) {
 
 
 
+set<string> operators;
+
+void init_operators(const char* filename) {
+    ifstream file(filename);
+    while (file.peek() != EOF)
+        operators.insert(string(1, file.get()));
+    file.close();
+}
+
+int is_operator(const string& now) {
+    return operators.find(now) != operators.end();
+}
+
+
+
 vector<Lexem> build_lexems(const char* filename) {
     ifstream file(filename);
     vector<Lexem> lexems;
@@ -211,7 +226,9 @@ vector<Lexem> build_lexems(const char* filename) {
                 }
                 lexems.push_back(Lexem(now.substr(2, now.size()-4), COM));
             }
-            else if (!lexems.empty() && (lexems.back().name == ")" || lexems.back().name == "]" || lexems.back().type == OBJ)) {
+            else if (!lexems.empty() && (lexems.back().name == ")" || 
+                            lexems.back().name == "]" || lexems.back().type == OBJ || 
+                            lexems.back().type == NUM)) {
                 #if DEBUG
                 cdeb << "\tin oper" << endl;
                 #endif
@@ -270,6 +287,19 @@ vector<Lexem> build_lexems(const char* filename) {
             else lexems.push_back(Lexem(now, OBJ));
         }
 
+        else if (is_operator(now)) {
+            #if DEBUG
+            cdeb << "in oper" << endl;
+            #endif
+            while (is_operator(string(1, file.peek())))
+                now.push_back(file.get());
+            if (now == "=>") 
+                lexems.push_back(Lexem(now, SPEC));
+            else if (is_operator(now))
+                lexems.push_back(Lexem(now, OPER));
+            else 
+                lexems.push_back(Lexem(now, UNK));
+        }
         
         #if DEBUG
         cdeb << "end " << now << endl;
@@ -302,6 +332,7 @@ void init_symbols() {
     init_keywords("./keywords.txt");
     init_spaces();
     init_hexes("./hexdigits.txt");
+    init_operators("./operators.txt");
 }
 
 
