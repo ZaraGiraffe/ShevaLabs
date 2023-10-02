@@ -24,19 +24,19 @@ struct Lexem {
 
 
 
-set<string> brackets;
+set<string> punctuations;
 
-void init_brackets() {
-    ifstream bracket_file("./brackets");
-    while(bracket_file.peek() != EOF) {
-        char br = bracket_file.get();
-        brackets.insert(string(1, br));
+void init_punctuation() {
+    ifstream punctuation_file("./brackets");
+    while(punctuation_file.peek() != EOF) {
+        char br = punctuation_file.get();
+        punctuations.insert(string(1, br));
     }
-    bracket_file.close();
+    punctuation_file.close();
 }
 
-int is_bracket(const string& now) {
-    return brackets.find(now) != brackets.end();
+int is_punctuation(const string& now) {
+    return punctuations.find(now) != punctuations.end();
 }
 
 
@@ -67,7 +67,7 @@ vector<Lexem> build_lexems(const char* filename) {
             now.clear();
         }
 
-        else if (is_bracket(now)) {
+        else if (is_punctuation(now)) {
 
         }
     }
@@ -83,5 +83,5 @@ void init_symbols() {
 
 
 int main() {
-    
+
 }
