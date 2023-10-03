@@ -34,3 +34,4 @@
     while
     with
     yield
+    let
