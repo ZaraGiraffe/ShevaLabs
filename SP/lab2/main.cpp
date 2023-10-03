@@ -40,7 +40,9 @@ int nodes_dfs(Node* now, map<Node*, int>& used, set<Node*>& last, string& res) {
     if (last.find(now) != last.end()) 
         return 1;
     used[now] = 1;
-    for (auto [ch, nxt] : now->next) {
+    for (auto par : now->next) {
+        char ch = par.first;
+        Node* nxt = par.second;
         if (used.find(nxt) == used.end()) {
             res.push_back(ch);
             int out = nodes_dfs(nxt, used, last, res);
@@ -59,7 +61,8 @@ string find_string(FiniteAutomata& fa, string& w1, string& w2) {
     if (!first)
         return "";
     set<Node*> last;
-    for (auto [srt, val] : fa.nodes) {
+    for (auto par : fa.nodes) {
+        Node* val = par.second;
         Node* nod = fa.make_word(val, w2);
         if (nod && nod->terminal) 
             last.insert(val);
@@ -74,10 +77,10 @@ string find_string(FiniteAutomata& fa, string& w1, string& w2) {
 
 
 int main() {
-    //const char* filename = "input_local.txt";
-    //FiniteAutomata fa = automata_from_file(filename);
+    const char* filename = "input_local.txt";
+    FiniteAutomata fa = automata_from_file(filename);
 
-    //string w1 = "ac", w2 = "bc";
-    //string res = find_string(fa, w1, w2);
-    //cout << "answer{" << res << "}" << endl;
+    string w1 = "ac", w2 = "bc";
+    string res = find_string(fa, w1, w2);
+    cout << "answer{" << res << "}" << endl;
 }
