@@ -77,10 +77,12 @@ string find_string(FiniteAutomata& fa, string& w1, string& w2) {
 
 
 int main() {
-    const char* filename = "input_local.txt";
+    const char* filename = "./input_local.txt";
     FiniteAutomata fa = automata_from_file(filename);
 
     string w1 = "ac", w2 = "bc";
     string res = find_string(fa, w1, w2);
-    cout << "answer{" << res << "}" << endl;
+    ofstream outfile("./output_local.txt");
+    outfile << "answer{" << res << "}" << endl;
+    outfile.close();
 }
