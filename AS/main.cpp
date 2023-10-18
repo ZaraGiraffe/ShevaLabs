@@ -5,6 +5,10 @@
 
 using namespace std;
 
+typedef long_int zint;          // zint means zahar integer
+
+
+
 int main() {
     
 }

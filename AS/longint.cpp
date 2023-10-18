@@ -157,7 +157,7 @@ struct long_int {
     }
 
     long_int operator-(const long_int& other) const {
-        long_int b = const_cast<long_int&>(other);
+        long_int b = other;
         b.sign ^= 1;
         return *this + b;
     }
@@ -206,11 +206,6 @@ struct long_int {
         return mas;
     }
 
-    void vcout(vector<int> v) const {
-    for (auto i : v) 
-        cout << i << " ";
-    }
-
     vector<int> divide(const vector<int>& a, const vector<int>& b) const {
         vector<int> l = {0};
         vector<int> r = a;
@@ -238,6 +233,37 @@ struct long_int {
         *this = *this / other;
     }
 
+    void vcout(vector<int> v) const {
+    for (auto i : v) 
+        cout << i << " ";
+    cout << endl;
+    }
+
+    long_int operator%(const long_int& other) const {
+        if (!other)
+            return long_int(0);
+        vector<int> arr = divide(X, other.X);
+        arr = mul(arr, other.X);
+        arr = sub(X, arr);
+        long_int res(0);
+        res.X = arr;
+        if (!res)
+            return res;
+        if (sign)
+            return other.abs() - res;
+        else 
+            return res;
+    }
+
+    void operator%=(const long_int& other) {
+        *this = *this % other;
+    } 
+
+    long_int abs() const {
+        long_int a = *this;
+        a.sign = 0;
+        return a;
+    }
     
     string str() const {
         string res;
