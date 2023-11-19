@@ -1,0 +1,1 @@
+SELECT CalculateTotalRevenueForHotel(1);
