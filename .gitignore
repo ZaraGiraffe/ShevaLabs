@@ -2,4 +2,4 @@
 *local*
 *.exe
 *settings*
-DB/idea
+DB/.idea/
